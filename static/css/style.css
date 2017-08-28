@@ -1,0 +1,46 @@
+body {
+  padding: 2%;
+  font-size: 1.7em;
+}
+
+h1 {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#chatBoard {
+  border: 2px solid #000;
+  width: 90%;
+  height: 500px;
+  margin: 2%;
+  width: 90%;
+  box-shadow: 7px 7px 5px #888888;
+  padding: 5px;
+}
+
+#chatInput {
+  width: 74%;
+  margin: 2%;
+  border: 2px solid #000;
+}
+
+button {
+  color: #fff;
+  background-color: #085394;
+  border: 2px solid #000;
+  box-shadow: 7px 7px 5px #888888;
+}
+
+li {
+  list-style-type: none;
+  line-height: 0.75em;
+}
+
+.postInfo {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.new_login {
+  font-style: italic;
+}

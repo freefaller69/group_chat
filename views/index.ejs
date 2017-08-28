@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Group Chat</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/skeleton.css">
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Scripts
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type ="text/javascript">
+  $(document).ready(function (){
+      // triggers connection event in server!
+      var socket = io.connect();
+      var user, txt;
+      socket.on("get_user_name", function(data){
+        user = prompt("Enter a username");
+        if (user == null || user == ""){
+          user = "Anonymous";
+        }
+        socket.emit("new_user", { user: user });
+        txt = "Current user: " + user;
+        $('#current_user').text(txt);
+        $('#chatInput').focus();
+      });
+
+      // submit to the server using emit
+      $('#send').on('click', function(e){
+        e.preventDefault();
+        socket.emit("send_text", {
+          user: user,
+          message: $('#chatInput').val()
+        });
+        return false;
+        });
+        // Add new message to chat board
+        socket.on("new_message", function (message){
+            $('#messages').append($('<li>').html("[" + message.timestamp + "] <span class='postInfo'>" + message.user + ":</span> " + message.message));
+            $('#chatInput').val('');
+        });
+        // New user notification broadcast
+        socket.on("user_joined", function(user){
+            $('#messages').append($('<li>').html("[" + user.timeStamp + "] <span class='new_login'>" + user.user + " has joined the chat session.</span>"));
+        });
+        // User disconnected broadcast
+        socket.on("user_disconnected", function(user){
+            $('#messages').append($('<li>').html("[" + user.timeStamp + "] <span class='new_login'>" + user.user + " has left the chat session.</span>"));
+        });
+        // load existing chat history for new user
+        socket.on("load_chat_history", function (chat_history){
+          chat_history.forEach(function(chat_history){
+              $('#messages').append($('<li>').html("[" + chat_history.timestamp + "] <span class='postInfo'>" + chat_history.user + ":</span> " + chat_history.message));
+            $('#chatInput').focus();
+          });
+        });
+
+        socket.emit("userJoin");
+    });
+  </script>
+
+</head>
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="container">
+    <div class="row">
+      <div class="nine columns">
+        <h1>Group Chat</h1>
+        <p id="current_user"></p>
+
+        <div id="chatBoard">
+          <ul id="messages"></ul>
+        </div>
+        <div id="chatForm">
+          <form action="">
+            <input type="text" id="chatInput" name="chatInput">
+            <button id="send">Send</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>
